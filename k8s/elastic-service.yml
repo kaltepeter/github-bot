@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: elastic-svc
+  labels:
+    app: elastic
+    role: master
+    tier: elk
+spec:
+  # type: NodePort
+  ports:
+    - name: elastic-http
+      port: 80
+      targetPort: 9200
+    - name: elastic-comms
+      port: 9300
+  # Replace with the IP of your minikube node / master node if you want external access
+  # externalIPs:
+  #   - xxx.zzz.yyy.qqq
+  selector:
+    app: elastic
+    role: master
+    tier: elk

@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    # nginx.org/ssl-services: "elastic-svc"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  tls:
+    - hosts:
+      - elk.core.merrillcorp.com
+      secretName: tls-certificate
+  rules:
+  - http:
+      paths:
+      - path: /elastic
+        backend:
+          serviceName: elastic-svc
+          servicePort: elastic-http

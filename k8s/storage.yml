@@ -1,0 +1,16 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: mrll-bot-volume
+  labels:
+    type: local
+spec:
+  storageClassName: "standard"
+  capacity:
+    storage: 5Gi
+  # volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  hostPath:
+    path: "/mnt/data/mrll-bot"
