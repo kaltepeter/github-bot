@@ -15,6 +15,8 @@ kubectl create secret tls tls-certificate --key tls-key.key --cert tls-cert.crt
 
 kubectl create secret generic tls-dhparam --from-file=dhparam.pem
 
+kubectl create secret generic basic-auth --from-file=auth
+
 kubectl create -f .
 
 echo "Appending minikube service IP to /etc/hosts"
