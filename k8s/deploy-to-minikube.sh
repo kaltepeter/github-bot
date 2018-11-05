@@ -28,7 +28,8 @@ kubectl create secret generic tls-dhparam --from-file="${__dir}/dhparam.pem"
 
 kubectl create secret generic basic-auth --from-file="${__dir}/auth"
 
-nohup minikube mount "${__dir}/..:/data" &>volume_mount.log &
+minikube mount "${__dir}/..:/data" &>"${__dir}/volume_mount.log" &
+echo $! >> "${__dir}/volume_mount.log"
 
 minikube addons enable ingress
 
