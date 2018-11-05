@@ -4,6 +4,8 @@ metadata:
   name: mrll-bot-volume
   labels:
     type: local
+  annotations:
+    pv.beta.kubernetes.io/gid: "1000"
 spec:
   storageClassName: "standard"
   capacity:
@@ -11,6 +13,6 @@ spec:
   # volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Delete
+  persistentVolumeReclaimPolicy: Retain
   hostPath:
-    path: "/mnt/data/mrll-bot"
+    path: "/data"

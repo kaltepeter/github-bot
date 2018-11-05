@@ -12,7 +12,7 @@ docker run --rm -d \
     -p 9400:9400 \
     -p 5044:5044 \
     -p 443:443 \
-    --add-host="192.168.99.100:${HOSTIP}" \
+    -p 9600:9600 \
     --name mrll-bot-logstash \
     -v "${__dir}/config:/usr/share/logstash/config" \
     -v "${__dir}/pipeline:/usr/share/logstash/pipeline" \

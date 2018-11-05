@@ -1,0 +1,95 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: logstash
+spec:
+  selector:
+    matchLabels:
+      app: logstash
+      role: master
+      tier: elk
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: logstash
+        role: master
+        tier: elk
+    spec:
+      securityContext:
+        # runAsUser: 1000
+        fsGroup: 1000
+      initContainers:
+        - name: volume-mount-hack
+          image: busybox
+          command: ["sh", "-c"] 
+          args:
+            - chmod -R 664 /usr/share/logstash;
+          volumeMounts:
+          - name: logstash-configs
+            mountPath: /usr/share/logstash
+      # initContainers:
+      #   - name: init-logstash
+      #     image: busybox:1.27.2
+      #     command: ["/bin/sh", "-c"]
+      #     args:
+      #       - chown -R 'logstash:' '/usr/share/logstash';
+      # #     args:
+      # #       - bin/logstash-plugin install logstash-input-github;
+      #     volumeMounts:
+      #       - name: logstash-configs
+      #         mountPath: /usr/share/logstash/config
+      #         subPath: logstash/config
+      #     #   - name: logstash-configs
+      #     #     mountPath: /usr/share/logstash/pipeline
+      #     #     subPath: logstash/pipeline
+      containers:
+        - name: logstash
+          image: mrllsvc/docker-logstash:1.0
+          # command: ["/bin/sh", "-c"]
+          # args:
+          #   - bin/logstash-plugin install logstash-input-github;
+          env:
+            - name: KUBERNETES_TRUST_CERT
+              value: "true"
+            - name: "http.host"
+              valueFrom:
+                fieldRef:
+                  fieldPath: "status.podIP"
+            - name: SECRET_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: basic-auth
+                  key: auth
+          ports:
+            - containerPort: 9400
+            - containerPort: 5044
+            - containerPort: 9600
+          volumeMounts:
+            - name: logstash-configs
+              mountPath: /usr/share/logstash/config
+              subPath: logstash/config
+            - name: logstash-configs
+              mountPath: /usr/share/logstash/pipeline
+              subPath: logstash/pipeline
+          securityContext:
+            allowPrivilegeEscalation: false
+          resources:
+            limits:
+              memory: 1Gi
+            requests:
+              memory: 1Gi
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: 9600
+          #   initialDelaySeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9600
+            initialDelaySeconds: 60
+      volumes:
+        - name: logstash-configs
+          persistentVolumeClaim:
+            claimName: mrll-bot-logstash-claim

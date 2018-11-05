@@ -22,4 +22,8 @@ spec:
       - path: /logstash
         backend:
           serviceName: logstash-svc
+          servicePort: logstash-api
+      - path: /logstash/github
+        backend:
+          serviceName: logstash-svc
           servicePort: logstash-github

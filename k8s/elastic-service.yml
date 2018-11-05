@@ -17,8 +17,7 @@ spec:
   # type: NodePort
   ports:
     - name: elastic-http
-      port: 80
-      targetPort: 9200
+      port: 9200
     - name: elastic-comms
       port: 9300
   # Replace with the IP of your minikube node / master node if you want external access
