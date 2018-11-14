@@ -16,39 +16,22 @@ spec:
         role: master
         tier: elk
     spec:
-      securityContext:
-        # runAsUser: 1000
-        fsGroup: 1000
-      initContainers:
-        - name: volume-mount-hack
-          image: busybox
-          command: ["sh", "-c"] 
-          args:
-            - chmod -R 664 /usr/share/logstash;
-          volumeMounts:
-          - name: logstash-configs
-            mountPath: /usr/share/logstash
+      # securityContext:
+      #   # runAsUser: 1000
+      #   fsGroup: 1000
       # initContainers:
-      #   - name: init-logstash
-      #     image: busybox:1.27.2
-      #     command: ["/bin/sh", "-c"]
+      #   - name: volume-mount-hack
+      #     image: busybox
+      #     command: ["sh", "-c"]
       #     args:
-      #       - chown -R 'logstash:' '/usr/share/logstash';
-      # #     args:
-      # #       - bin/logstash-plugin install logstash-input-github;
+      #       - chmod -R 774 /usr/share/logstash;
       #     volumeMounts:
-      #       - name: logstash-configs
-      #         mountPath: /usr/share/logstash/config
-      #         subPath: logstash/config
-      #     #   - name: logstash-configs
-      #     #     mountPath: /usr/share/logstash/pipeline
-      #     #     subPath: logstash/pipeline
+      #     - name: logstash-configs
+      #       mountPath: /usr/share/logstash
       containers:
         - name: logstash
-          image: mrllsvc/docker-logstash:1.0
-          # command: ["/bin/sh", "-c"]
-          # args:
-          #   - bin/logstash-plugin install logstash-input-github;
+          image: mrllsvc/docker-logstash:6.4.3-github
+          imagePullPolicy: Always
           env:
             - name: KUBERNETES_TRUST_CERT
               value: "true"
@@ -56,24 +39,36 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: "status.podIP"
-            - name: SECRET_AUTH_TOKEN
+            # - name: SECRET_AUTH_TOKEN
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: basic-auth
+            #       key: auth
+            # - name: "xpack.monitoring.elasticsearch.url"
+            #   value: "elastic-svc.default.svc.cluster.local"
+            - name: "xpack.monitoring.elasticsearch.username"
               valueFrom:
                 secretKeyRef:
-                  name: basic-auth
-                  key: auth
+                  name: elastic-pw
+                  key: username
+            - name: "xpack.monitoring.elasticsearch.password"
+              valueFrom:
+                secretKeyRef:
+                  name: elastic-pw
+                  key: password
           ports:
             - containerPort: 9400
             - containerPort: 5044
             - containerPort: 9600
-          volumeMounts:
-            - name: logstash-configs
-              mountPath: /usr/share/logstash/config
-              subPath: logstash/config
-            - name: logstash-configs
-              mountPath: /usr/share/logstash/pipeline
-              subPath: logstash/pipeline
-          securityContext:
-            allowPrivilegeEscalation: false
+          # volumeMounts:
+          #   - name: logstash-configs
+          #     mountPath: /usr/share/logstash/config
+          #     subPath: logstash/config
+          #   - name: logstash-configs
+          #     mountPath: /usr/share/logstash/pipeline
+          #     subPath: logstash/pipeline
+          # securityContext:
+          #   allowPrivilegeEscalation: false
           resources:
             limits:
               memory: 1Gi
@@ -89,7 +84,7 @@ spec:
               path: /
               port: 9600
             initialDelaySeconds: 60
-      volumes:
-        - name: logstash-configs
-          persistentVolumeClaim:
-            claimName: mrll-bot-logstash-claim
+      # volumes:
+      #   - name: logstash-configs
+      #     persistentVolumeClaim:
+      #       claimName: mrll-bot-logstash-claim
