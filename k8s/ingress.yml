@@ -27,3 +27,7 @@ spec:
         backend:
           serviceName: logstash-svc
           servicePort: logstash-github
+      - path: /
+        backend:
+          serviceName: kibana-svc
+          servicePort: kibana-api
