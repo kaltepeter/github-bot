@@ -1,0 +1,46 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: kibana
+spec:
+  selector:
+    matchLabels:
+      app: kibana
+      role: master
+      tier: elk
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kibana
+        role: master
+        tier: elk
+    spec:
+      containers:
+        - name: kibana
+          image: mrllsvc/docker-kibana:6.4.3-config
+          imagePullPolicy: Always
+          env:
+            - name: "http.host"
+              valueFrom:
+                fieldRef:
+                  fieldPath: "status.podIP"
+            - name: "ELASTIC_URL"
+              value: "http://elastic-svc.default.svc.cluster.local"
+            - name: "ELASTIC_USERNAME"
+              valueFrom:
+                secretKeyRef:
+                  name: user-kibana
+                  key: username
+            - name: ELASTIC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: user-kibana
+                  key: password
+            # - name: SECRET_AUTH_TOKEN
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: basic-auth
+            #       key: auth
+          ports:
+            - containerPort: 5601

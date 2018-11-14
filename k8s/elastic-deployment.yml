@@ -1,0 +1,65 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: elastic
+spec:
+  selector:
+    matchLabels:
+      app: elastic
+      role: master
+      tier: elk
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: elastic
+        role: master
+        tier: elk
+    spec:
+      # securityContext:
+      #   runAsUser: 1000
+      #   fsGroup: 1000
+      initContainers:
+        - name: init-sysctl
+          image: busybox:1.27.2
+          command: ["/bin/sh", "-c"]
+          args:
+            - sysctl -w vm.max_map_count=262144;
+              # chmod -R 755 /usr/share/elasticsearch/data;
+          # command:
+          # - sysctl
+          # - -w
+          # - vm.max_map_count=262144
+          securityContext:
+            privileged: true
+          # volumeMounts:
+          #   - name: data
+          #     mountPath: /usr/share/elasticsearch/data
+      containers:
+        - name: elastic
+          image: mrllsvc/docker-elastic:6.4.3
+          imagePullPolicy: Always
+          env:
+            - name: "network.host"
+              valueFrom:
+                fieldRef:
+                  fieldPath: "status.podIP"
+            - name: "xpack.security.enabled"
+              value: "true"
+          ports:
+            - containerPort: 9200
+            - containerPort: 9300
+          # volumeMounts:
+          #   - name: data
+          #     mountPath: /usr/share/elasticsearch/data
+          #   - name: elastic-config
+          #     mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+      # volumes:
+      #   - name: data
+      #     persistentVolumeClaim:
+      #       claimName: mrll-bot-elastic-claim
+        # - name: elastic-config
+        #   hostPath:
+        #     # directory location on host
+        #     path: ../elastic/elasticsearch.yml
+        #     type: File

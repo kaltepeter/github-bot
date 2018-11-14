@@ -1,0 +1,12 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mrll-bot-logstash-claim
+spec:
+  storageClassName: "standard"
+  volumeName: "mrll-bot-volume"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2.5Gi
