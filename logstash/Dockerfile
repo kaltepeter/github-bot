@@ -1,6 +1,6 @@
 FROM docker.elastic.co/logstash/logstash:6.4.3
 
-ENV ELASTIC_USERNAME kibana
+ENV ELASTIC_USERNAME elastic
 ENV ELASTIC_HOST "elastic-svc.default.svc.cluster.local"
 ARG ELASTIC_PASSWORD
 

@@ -7,9 +7,7 @@ server.host: "0.0.0.0"
 # for local
 # elasticsearch.customHeaders: { Authorization: "Basic my_token" }
 elasticsearch.ssl.verificationMode: "none"
-# for local
-elasticsearch.url: "https://elk.core.merrillcorp.com:443/elastic"
-# elasticsearch.url: "http://elastic-svc.default.svc.cluster.local"
+elasticsearch.url: "${ELASTIC_URL}"
 # xpack.monitoring.ui.container.elasticsearch.enabled: false
 elasticsearch.username: "${ELASTIC_USERNAME}"
 elasticsearch.password: "${ELASTIC_PASSWORD}"

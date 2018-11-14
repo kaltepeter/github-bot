@@ -39,22 +39,27 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: "status.podIP"
-            # - name: SECRET_AUTH_TOKEN
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: basic-auth
-            #       key: auth
-            # - name: "xpack.monitoring.elasticsearch.url"
-            #   value: "elastic-svc.default.svc.cluster.local"
+            - name: "xpack.monitoring.elasticsearch.url"
+              value: "elastic-svc.default.svc.cluster.local"
             - name: "xpack.monitoring.elasticsearch.username"
               valueFrom:
                 secretKeyRef:
-                  name: elastic-pw
+                  name: user-logstash-system
                   key: username
             - name: "xpack.monitoring.elasticsearch.password"
               valueFrom:
                 secretKeyRef:
-                  name: elastic-pw
+                  name: user-logstash-system
+                  key: password
+            - name: "ELASTIC_USERNAME"
+              valueFrom:
+                secretKeyRef:
+                  name: user-elastic
+                  key: username
+            - name: "ELASTIC_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: user-elastic
                   key: password
           ports:
             - containerPort: 9400
